@@ -1,0 +1,78 @@
+#chat {
+  position: absolute;
+  z-index: 10000;
+  bottom: 90px;
+  left: 20px;
+  width: 300px;
+  /*background-color: rgba(46, 41, 41, 0.2);*/
+  background-color: rgba(107,109,236,0.2);
+  border-radius: 16px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+#chat:hover {
+  box-shadow: 0 0 5px 0 #121256;
+}
+
+.name-input {
+  font-size: 36px;
+  height: 64px;
+  text-align: center;
+  border: none;
+  border-radius: 4px;
+  outline: none;
+  padding-left: 10px;
+  font-size: 15px;
+  border-radius: 8px;
+}
+
+.name-input:focus {
+  box-shadow: 0 0 5px 0 #121256;
+}
+
+.input {
+  resize: none;
+  border-radius: 8px;
+  outline: none;
+  padding-left: 10px;
+  border: none;
+}
+
+.input:focus {
+  box-shadow: 0 0 5px 0 #121256;
+}
+
+.messages {
+  margin: 10px 0;
+  padding: 10px 0;
+  max-height: 445px;
+  overflow: scroll;
+  /*overflow-x: hidden; hides the bottom scrollbar */
+}
+
+.messages::-webkit-scrollbar {
+  display: none; /*hides all the scrollbars. comment this out to show the scrollbars and then uncomment the overflow-x line above to hide the bottom one */
+
+}
+
+.message {
+  background: rgba(255, 255, 255, 0.7);
+  overflow-wrap: break-word;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  margin: 5px auto 5px 0;
+  border-radius: 8px;
+  width: fit-content;
+  max-width: 300px;
+  padding: 10px;
+  color:#000000;
+}
+
+.message.user {
+  /*background-color: rgba(155, 110, 27, 0.726);*/
+  background-color:#121256;
+  color: white;
+}
