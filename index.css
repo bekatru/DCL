@@ -72,7 +72,18 @@
 }
 
 .message.user {
-  /*background-color: rgba(155, 110, 27, 0.726);*/
   background-color:#121256;
   color: white;
+}
+
+.new-join {
+  overflow-wrap: break-word;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  margin: 5px auto 5px 0;
+  border-radius: 8px;
+  width: fit-content;
+  max-width: 300px;
+  padding: 10px;
+  color:#000000;
 }

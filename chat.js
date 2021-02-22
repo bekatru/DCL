@@ -4,7 +4,7 @@ const api_key2 = "e3612098484d98c628b4bcb0f52cd1ab3fa1c05b72cbe93e51d42f91";
 Math.seedrandom(window.location.pathname);
 const channel = Math.random().toString().replace("0", "").slice(1, 5);
 console.log(channel);
-// Math.seedrandom();
+Math.seedrandom();
 
 const url = `wss://us-nyc-1.websocket.me/v3/${channel}?api_key=${api_key}&notify_self`;
 class App extends React.Component {
@@ -85,6 +85,7 @@ class App extends React.Component {
       this.setState((state) => ({ name: state.name.slice(0, -1) }));
     } else if (key === "Enter" && this.state.name.length) {
       this.setState({ isLogged: true });
+      this.submitMessage('new_joining');
     }
   }
 
@@ -169,6 +170,17 @@ class Message extends React.PureComponent {
 
   render() {
     const { data, id } = this.props;
+    if (data.message === 'new_joining') {
+      if (id === data.id) {
+        return null;
+      }
+      return (
+        <div className={'new-join'}>
+        <b>{data.name + ' '}</b>
+        {"joined the chat"}
+      </div>
+      )
+    }
     const style = data.id === id ? "message user" : "message";
     return (
       <div className={style}>
