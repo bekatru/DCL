@@ -1,6 +1,12 @@
 const api_key = "pjVN997xEz82304l9HmceblDsr3neV95Mku6pS0C";
 const api_key2 = "e3612098484d98c628b4bcb0f52cd1ab3fa1c05b72cbe93e51d42f91";
 
+window.onbeforeunload = function(e) {
+  var dialogText = 'Dialog text here';
+  e.returnValue = dialogText;
+  return dialogText;
+};
+
 Math.seedrandom(window.location.pathname);
 const channel = Math.random().toString().replace("0", "").slice(1, 5);
 console.log(channel);
@@ -19,8 +25,9 @@ class App extends React.Component {
       messages: [],
     };
   }
-
+  
   componentDidMount() {
+    window.addEventListener('beforeunload', this.keepOnPage);
     const { ws } = this.state;
 
     this.handleId();
@@ -33,6 +40,7 @@ class App extends React.Component {
 
     ws.onmessage = (evt) => {
       const message = JSON.parse(evt.data);
+      if (message.message === '') return;
       this.setState((state) => ({ messages: [...state.messages, message] }));
     };
 
@@ -40,6 +48,10 @@ class App extends React.Component {
       console.log("disconnected");
       this.setState({ ws: new WebSocket(url) });
     };
+  }
+  
+  keepOnPage =(ev)=> {
+    this.submitMessage('left the chat');
   }
 
   // Get IP
@@ -85,7 +97,7 @@ class App extends React.Component {
       this.setState((state) => ({ name: state.name.slice(0, -1) }));
     } else if (key === "Enter" && this.state.name.length) {
       this.setState({ isLogged: true });
-      this.submitMessage('new_joining');
+      this.submitMessage('joined the chat');
     }
   }
 
@@ -93,6 +105,7 @@ class App extends React.Component {
     if (this.state.isLogged) {
       return (
         <React.Fragment>
+          <OnLine/>
           <Chat messages={this.state.messages} id={this.state.id} />
           <Input submitMessage={this.submitMessage.bind(this)} />
         </React.Fragment>
@@ -100,6 +113,7 @@ class App extends React.Component {
     } else {
       return (
         <input
+          autoFocus
           className="name-input"
           placeholder="Enter your name to start chatting!"
           onKeyDown={(e) => this.handleName(e.key)}
@@ -151,6 +165,7 @@ class Input extends React.PureComponent {
   render() {
     return (
       <textarea
+        autoFocus
         className="input"
         rows="4"
         cols="40"
@@ -170,15 +185,15 @@ class Message extends React.PureComponent {
 
   render() {
     const { data, id } = this.props;
-    if (data.message === 'new_joining') {
+    if (data.message === 'joined the chat' || data.message === 'left the chat') {
       if (id === data.id) {
         return null;
       }
       return (
         <div className={'new-join'}>
-        <b>{data.name + ' '}</b>
-        {"joined the chat"}
-      </div>
+          <b>{data.name + ' '}</b>
+          {data.message}
+        </div>
       )
     }
     const style = data.id === id ? "message user" : "message";
@@ -188,6 +203,34 @@ class Message extends React.PureComponent {
         {data.message}
       </div>
     );
+  }
+}
+
+class OnLine extends React.PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      expanded: false,
+      count: 0,
+      users: []
+    }
+  }
+
+  render() {
+    const {count, users, expanded} = this.state;
+    const userslist = expanded ? 'userslist-expanded' : 'userslist-collapsed'; 
+    return (
+      <React.Fragment>
+        <div className='online-users'>
+          {count}<div onClick={() => this.setState({expanded: !expanded})} className='users'>users</div>online
+        </div>
+        <div className={userslist}>
+            asdasd
+            asdasdasda
+            asdasdasd
+        </div>
+      </React.Fragment>
+    )
   }
 }
 

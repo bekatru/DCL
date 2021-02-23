@@ -87,3 +87,27 @@
   padding: 10px;
   color:#000000;
 }
+
+.online-users {
+  display: flex;
+}
+
+.users {
+  margin: 0 5px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.users:hover {
+  text-decoration: none;
+  color: #121256;
+}
+
+.userslist-collapsed {
+  display: none;
+}
+
+.userslist-expanded {
+  
+}
+
