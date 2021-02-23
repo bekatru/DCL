@@ -1,11 +1,5 @@
-const api_key = "pjVN997xEz82304l9HmceblDsr3neV95Mku6pS0C";
+const api_key = "PjbrX0griIUkeRd3y8Rza0dZPBqlilvd39Ncrw7O";
 const api_key2 = "e3612098484d98c628b4bcb0f52cd1ab3fa1c05b72cbe93e51d42f91";
-
-window.onbeforeunload = function(e) {
-  var dialogText = 'Dialog text here';
-  e.returnValue = dialogText;
-  return dialogText;
-};
 
 Math.seedrandom(window.location.pathname);
 const channel = Math.random().toString().replace("0", "").slice(1, 5);
@@ -23,11 +17,12 @@ class App extends React.Component {
       id: "",
       ws: new WebSocket(url),
       messages: [],
+      users: [],
     };
   }
-  
+
   componentDidMount() {
-    window.addEventListener('beforeunload', this.keepOnPage);
+    window.addEventListener("beforeunload", this.keepOnPage);
     const { ws } = this.state;
 
     this.handleId();
@@ -40,7 +35,19 @@ class App extends React.Component {
 
     ws.onmessage = (evt) => {
       const message = JSON.parse(evt.data);
-      if (message.message === '') return;
+      if (message.message === "") return;
+      if (message.id === "service") {
+        this.setState((state) => {
+          if (message.message === "joined the chat") {
+            return { users: [...state.users, message.name] };
+          }
+          if (message.message === "left the chat") {
+            return {
+              users: state.users.filter((user) => user !== message.name),
+            };
+          }
+        });
+      }
       this.setState((state) => ({ messages: [...state.messages, message] }));
     };
 
@@ -49,10 +56,12 @@ class App extends React.Component {
       this.setState({ ws: new WebSocket(url) });
     };
   }
-  
-  keepOnPage =(ev)=> {
-    this.submitMessage('left the chat');
-  }
+
+  keepOnPage = (ev) => {
+    if (this.state.name) {
+      this.submitMessage("left the chat");
+    }
+  };
 
   // Get IP
   async getip() {
@@ -97,16 +106,17 @@ class App extends React.Component {
       this.setState((state) => ({ name: state.name.slice(0, -1) }));
     } else if (key === "Enter" && this.state.name.length) {
       this.setState({ isLogged: true });
-      this.submitMessage('joined the chat');
+      this.submitMessage("joined the chat");
     }
   }
 
   render() {
-    if (this.state.isLogged) {
+    const { users, isLogged, messages, id } = this.state;
+    if (isLogged) {
       return (
         <React.Fragment>
-          <OnLine/>
-          <Chat messages={this.state.messages} id={this.state.id} />
+          <OnLine users={users} />
+          <Chat messages={messages} id={id} />
           <Input submitMessage={this.submitMessage.bind(this)} />
         </React.Fragment>
       );
@@ -185,18 +195,17 @@ class Message extends React.PureComponent {
 
   render() {
     const { data, id } = this.props;
-    if (data.message === 'joined the chat' || data.message === 'left the chat') {
-      if (id === data.id) {
-        return null;
-      }
+    const style = data.id === id ? "message user" : "message";
+    if (data.id === "service") {
       return (
-        <div className={'new-join'}>
-          <b>{data.name + ' '}</b>
+        <div>
+          <b>{data.name + " "}</b>
           {data.message}
         </div>
-      )
+      );
     }
-    const style = data.id === id ? "message user" : "message";
+    if (data.message === "joined the chat" || data.message === "left the chat")
+      return null;
     return (
       <div className={style}>
         <b>{data.name + ": "}</b>
@@ -211,26 +220,34 @@ class OnLine extends React.PureComponent {
     super(props);
     this.state = {
       expanded: false,
-      count: 0,
-      users: []
-    }
+    };
   }
 
   render() {
-    const {count, users, expanded} = this.state;
-    const userslist = expanded ? 'userslist-expanded' : 'userslist-collapsed'; 
+    const { users } = this.props;
+    const { expanded } = this.state;
+    const userslist = expanded ? "userslist-expanded" : "userslist-collapsed";
     return (
       <React.Fragment>
-        <div className='online-users'>
-          {count}<div onClick={() => this.setState({expanded: !expanded})} className='users'>users</div>online
+        <div className="online-users">
+          {users.length}
+          <div
+            onClick={() => this.setState({ expanded: !expanded })}
+            className="users"
+          >
+            users
+          </div>
+          online
         </div>
         <div className={userslist}>
-            asdasd
-            asdasdasda
-            asdasdasd
+          {users.map((user, index) => (
+            <div className="online-user" key={index}>
+              {user}
+            </div>
+          ))}
         </div>
       </React.Fragment>
-    )
+    );
   }
 }
 
