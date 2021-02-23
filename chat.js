@@ -37,16 +37,9 @@ class App extends React.Component {
       const message = JSON.parse(evt.data);
       if (message.message === "") return;
       if (message.id === "service") {
-        this.setState((state) => {
-          if (message.message === "joined the chat") {
-            return { users: [...state.users, message.name] };
-          }
-          if (message.message === "left the chat") {
-            return {
-              users: state.users.filter((user) => user !== message.name),
-            };
-          }
-        });
+        if (message.type === "online") {
+          this.setState({ users: message.users });
+        }
       }
       this.setState((state) => ({ messages: [...state.messages, message] }));
     };
