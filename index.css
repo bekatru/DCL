@@ -112,5 +112,7 @@
 }
 
 .online-user {
+  padding: 5px;
+  border: 1px solid green;
   margin-right: 5px;
 }

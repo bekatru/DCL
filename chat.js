@@ -24,15 +24,11 @@ class App extends React.Component {
   componentDidMount() {
     window.addEventListener("beforeunload", this.keepOnPage);
     const { ws } = this.state;
-
     this.handleId();
-
     this.getip();
-
     ws.onopen = () => {
       console.log("Connected to Chat");
     };
-
     ws.onmessage = (evt) => {
       const message = JSON.parse(evt.data);
       if (message.message === "") return;
@@ -43,7 +39,6 @@ class App extends React.Component {
       }
       this.setState((state) => ({ messages: [...state.messages, message] }));
     };
-
     ws.onclose = () => {
       console.log("disconnected");
       this.setState({ ws: new WebSocket(url) });
