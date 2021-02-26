@@ -1,4 +1,4 @@
-const api_key = "PjbrX0griIUkeRd3y8Rza0dZPBqlilvd39Ncrw7O";
+const api_key = "pjVN997xEz82304l9HmceblDsr3neV95Mku6pS0C";
 const api_key2 = "e3612098484d98c628b4bcb0f52cd1ab3fa1c05b72cbe93e51d42f91";
 
 Math.seedrandom(window.location.pathname);
