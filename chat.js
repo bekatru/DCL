@@ -12,6 +12,7 @@ class App extends React.Component {
     super();
     this.state = {
       isLogged: false,
+      isCollapsed: false,
       name: "",
       ip: "",
       id: "",
@@ -99,14 +100,43 @@ class App extends React.Component {
   }
 
   render() {
-    const { users, isLogged, messages, id } = this.state;
+    const { users, isLogged, messages, id, isCollapsed } = this.state;
     if (isLogged) {
-      return (
-        <React.Fragment>
+      return isCollapsed ? (
+        <div
+          className="expand-icon"
+          onClick={() => this.setState({ isCollapsed: false })}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="40"
+            height="40"
+          >
+            <path fill="none" d="M0 0h24v24H0z" />
+            <path d="M14.45 19L12 22.5 9.55 19H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-6.55zm-1.041-2H20V5H4v12h6.591L12 19.012 13.409 17z" />
+          </svg>
+        </div>
+      ) : (
+        <div className={isCollapsed ? "chat-collapsed" : "chat-expanded"}>
+          <div
+            onClick={() => this.setState({ isCollapsed: true })}
+            className="collapse-icon"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              width="24"
+              height="24"
+            >
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path d="M12.36 13.05L17.31 18H5.998V6.688l4.95 4.95 5.656-5.657 1.415 1.414z" />
+            </svg>
+          </div>
           <OnLine users={users} />
           <Chat messages={messages} id={id} />
           <Input submitMessage={this.submitMessage.bind(this)} />
-        </React.Fragment>
+        </div>
       );
     } else {
       return (
@@ -149,13 +179,24 @@ class Input extends React.PureComponent {
     this.state = {
       value: "",
     };
+    this.inputField = React.createRef();
+  }
+
+  componentDidMount() {
+    window.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        this.inputField.current.focus();
+        this.setState({ value: "" });
+      }
+    });
   }
 
   handleSend = (e) => {
-    if (e.code === "Enter" && this.state.value !== "\n") {
-      this.props.submitMessage(this.state.value);
+    const { value } = this.state;
+    if (e.code === "Enter" && value !== "\n" && value !== "") {
+      this.props.submitMessage(value);
       this.setState({ value: "" });
-    } else if (this.state.value === "\n") {
+    } else if (value === "\n") {
       this.setState({ value: "" });
     }
   };
@@ -163,7 +204,7 @@ class Input extends React.PureComponent {
   render() {
     return (
       <textarea
-        autoFocus
+        ref={this.inputField}
         className="input"
         rows="4"
         cols="40"

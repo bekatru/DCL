@@ -1,3 +1,7 @@
+html {
+  background-color: grey;
+}
+
 #chat {
   position: absolute;
   z-index: 10000;
@@ -120,4 +124,24 @@
   padding: 5px 5px 5px 0;
   font-weight: 600;
   user-select: none;
+}
+
+.online-user:not(:last-child):after {
+  display: inline-block;
+  content: ",";
+}
+
+.chat-expanded {
+  position: relative;
+}
+
+.chat-collapsed {
+  display: none;
+}
+
+.collapse-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
 }
