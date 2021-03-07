@@ -7,7 +7,7 @@ const channel = Math.random().toString().replace("0", "").slice(1, 5);
 console.log(channel);
 Math.seedrandom();
 
-const url = `wss://us-nyc-1.websocket.me/v3/${channel}?api_key=${api_key_beka}&notify_self`;
+const url = `wss://us-nyc-1.websocket.me/v3/${channel}?api_key=${api_key}&notify_self`;
 class App extends React.Component {
   constructor() {
     super();
@@ -31,23 +31,28 @@ class App extends React.Component {
     ws.onopen = () => {
       console.log("Connected to Chat");
     };
-
     ws.onmessage = (evt) => {
-    const data = JSON.parse(evt.data);
-    const {id, type, onlineUsers} = data; 
-    switch (id + '_' + type) {
-        case 'service_connection':
-            this.setState({users: onlineUsers});
+      const data = JSON.parse(evt.data);
+      const { type, message, id, onlineUsers, name, messages, adress } = data;
+      console.log({ onmessage: data }); //Console
+      if (id === "service") {
+        switch (type) {
+          case "connection":
+            this.setState({ users: onlineUsers });
+            if (messages && adress === this.state.id) {
+              this.setState({
+                messages: [...this.state.messages, ...messages],
+              });
+            }
             break;
-        default:
+          default:
             console.log(data);
-    }
-    //   if (message.id === "service") {
-    //     if (message.type === "online") {
-    //       this.setState({ users: message.users });
-    //     }
-    //   }
-    //   this.setState((state) => ({ messages: [...state.messages, message] }));
+        }
+      } else {
+        this.setState({
+          messages: [...this.state.messages, { type, id, name, message }],
+        });
+      }
     };
 
     ws.onclose = () => {
@@ -77,19 +82,13 @@ class App extends React.Component {
 
   // ID Handler
   handleId() {
-    const id = localStorage.getItem("dcl_chat_id");
-    if (localStorage.getItem("dcl_chat_id")) {
-      this.setState({ id: id });
-    } else {
-      const new_id = Math.random().toString(16).substring(2, 8).toUpperCase();
-      this.setState({ id: new_id });
-      localStorage.setItem("dcl_chat_id", new_id);
-    }
+    const new_id = Math.random().toString(16).substring(2, 8).toUpperCase();
+    this.setState({ id: new_id });
   }
 
   // Send Handler
-  submitMessage(message, type = 'default') {
-    if (message === '') return; //Prevent from sending an empty message
+  submitMessage(message, type = "default") {
+    if (message === "") return; //Prevent from sending an empty message
     const { name, id, ws, ip } = this.state;
     ws.send(JSON.stringify({ type, name, id, ip, message, date: new Date() }));
   }
@@ -106,7 +105,7 @@ class App extends React.Component {
       this.setState((state) => ({ name: state.name.slice(0, -1) }));
     } else if (key === "Enter" && this.state.name.length) {
       this.setState({ isLogged: true });
-      this.submitMessage("joined", 'connection');
+      this.submitMessage("joined", "connection");
     }
   }
 
@@ -121,8 +120,8 @@ class App extends React.Component {
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
-            width="40"
-            height="40"
+            width="44"
+            height="44"
           >
             <path fill="none" d="M0 0h24v24H0z" />
             <path d="M14.45 19L12 22.5 9.55 19H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-6.55zm-1.041-2H20V5H4v12h6.591L12 19.012 13.409 17z" />
@@ -236,11 +235,11 @@ class Message extends React.PureComponent {
   render() {
     const { data, id } = this.props;
     const style = data.id === id ? "message user" : "message";
-    if (data.id === "service") {
+    if (data.type === "connection") {
       return (
         <div>
           <b>{data.name + " "}</b>
-          {data.message}
+          {data.message + " the chat"}
         </div>
       );
     }
@@ -264,7 +263,7 @@ class OnLine extends React.PureComponent {
   }
 
   render() {
-    const {users} = this.props;
+    const { users } = this.props;
     const { expanded } = this.state;
     const userslist = expanded ? "userslist-expanded" : "userslist-collapsed";
     return (
@@ -280,7 +279,7 @@ class OnLine extends React.PureComponent {
           online
         </div>
         <div className={userslist}>
-          {users.map(({name}, index) => (
+          {users.map(({ name }, index) => (
             <div className="online-user" key={index}>
               {name}
             </div>
