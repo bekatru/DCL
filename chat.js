@@ -193,12 +193,14 @@ class Input extends React.PureComponent {
   }
 
   componentDidMount() {
-    window.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        this.inputField.current.focus();
-        this.setState({ value: "" });
+      if(this.inputField) {
+          window.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+              this.inputField.current.focus();
+              this.setState({ value: "" });
+            }
+          });
       }
-    });
   }
 
   handleSend = (e) => {
