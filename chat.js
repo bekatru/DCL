@@ -1,4 +1,5 @@
 const api_key = "pjVN997xEz82304l9HmceblDsr3neV95Mku6pS0C";
+const api_key_beka = "PjbrX0griIUkeRd3y8Rza0dZPBqlilvd39Ncrw7O";
 const api_key2 = "e3612098484d98c628b4bcb0f52cd1ab3fa1c05b72cbe93e51d42f91";
 
 Math.seedrandom(window.location.pathname);
@@ -6,7 +7,7 @@ const channel = Math.random().toString().replace("0", "").slice(1, 5);
 console.log(channel);
 Math.seedrandom();
 
-const url = `wss://us-nyc-1.websocket.me/v3/${channel}?api_key=${api_key}&notify_self`;
+const url = `wss://us-nyc-1.websocket.me/v3/${channel}?api_key=${api_key_beka}&notify_self`;
 class App extends React.Component {
   constructor() {
     super();
@@ -30,16 +31,25 @@ class App extends React.Component {
     ws.onopen = () => {
       console.log("Connected to Chat");
     };
+
     ws.onmessage = (evt) => {
-      const message = JSON.parse(evt.data);
-      if (message.message === "") return;
-      if (message.id === "service") {
-        if (message.type === "online") {
-          this.setState({ users: message.users });
-        }
-      }
-      this.setState((state) => ({ messages: [...state.messages, message] }));
+    const data = JSON.parse(evt.data);
+    const {id, type, onlineUsers} = data; 
+    switch (id + '_' + type) {
+        case 'service_connection':
+            this.setState({users: onlineUsers});
+            break;
+        default:
+            console.log(data);
+    }
+    //   if (message.id === "service") {
+    //     if (message.type === "online") {
+    //       this.setState({ users: message.users });
+    //     }
+    //   }
+    //   this.setState((state) => ({ messages: [...state.messages, message] }));
     };
+
     ws.onclose = () => {
       console.log("disconnected");
       this.setState({ ws: new WebSocket(url) });
@@ -48,7 +58,7 @@ class App extends React.Component {
 
   keepOnPage = (ev) => {
     if (this.state.name) {
-      this.submitMessage("left the chat");
+      this.submitMessage("left", "connection");
     }
   };
 
@@ -71,16 +81,17 @@ class App extends React.Component {
     if (localStorage.getItem("dcl_chat_id")) {
       this.setState({ id: id });
     } else {
-      const new_id = Math.random().toString(16).substring(2);
+      const new_id = Math.random().toString(16).substring(2, 8).toUpperCase();
       this.setState({ id: new_id });
       localStorage.setItem("dcl_chat_id", new_id);
     }
   }
 
   // Send Handler
-  submitMessage(message) {
+  submitMessage(message, type = 'default') {
+    if (message === '') return; //Prevent from sending an empty message
     const { name, id, ws, ip } = this.state;
-    ws.send(JSON.stringify({ name, id, ip, message, date: new Date() }));
+    ws.send(JSON.stringify({ type, name, id, ip, message, date: new Date() }));
   }
 
   // Handle Name Input
@@ -95,7 +106,7 @@ class App extends React.Component {
       this.setState((state) => ({ name: state.name.slice(0, -1) }));
     } else if (key === "Enter" && this.state.name.length) {
       this.setState({ isLogged: true });
-      this.submitMessage("joined the chat");
+      this.submitMessage("joined", 'connection');
     }
   }
 
@@ -253,7 +264,7 @@ class OnLine extends React.PureComponent {
   }
 
   render() {
-    const { users } = this.props;
+    const {users} = this.props;
     const { expanded } = this.state;
     const userslist = expanded ? "userslist-expanded" : "userslist-collapsed";
     return (
@@ -269,9 +280,9 @@ class OnLine extends React.PureComponent {
           online
         </div>
         <div className={userslist}>
-          {users.map((user, index) => (
+          {users.map(({name}, index) => (
             <div className="online-user" key={index}>
-              {user}
+              {name}
             </div>
           ))}
         </div>
