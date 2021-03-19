@@ -7,6 +7,14 @@ const channel = Math.random().toString().replace("0", "").slice(1, 5);
 console.log(channel);
 Math.seedrandom();
 
+// detectEthereumProvider()
+//   .then((provider) =>
+//     provider
+//       .request({ method: "eth_accounts" })
+//       .then((accounts) => console.log(accounts))
+//   )
+//   .catch((err) => console.log(err));
+
 const url = `wss://us-nyc-1.websocket.me/v3/${channel}?api_key=${api_key}&notify_self`;
 class App extends React.Component {
   constructor() {
@@ -109,6 +117,19 @@ class App extends React.Component {
     }
   }
 
+  mmEnable() {
+    const { ethereum } = window;
+    let chainId;
+    const a = window.web3.eth.coinbase;
+    console.log(a);
+    ethereum
+      .request({ method: "eth_requestAccounts" })
+      .then((accounts) => (chainId = accounts[0]))
+      .catch((error) => console.log(error));
+
+    ethereum.on("connect", ({ chainId }) => {});
+  }
+
   render() {
     const { users, isLogged, messages, id, isCollapsed } = this.state;
     if (isLogged) {
@@ -117,15 +138,7 @@ class App extends React.Component {
           className="expand-icon"
           onClick={() => this.setState({ isCollapsed: false })}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="44"
-            height="44"
-          >
-            <path fill="none" d="M0 0h24v24H0z" />
-            <path stroke='white' fill="white" d="M14.45 19L12 22.5 9.55 19H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-6.55zm-1.041-2H20V5H4v12h6.591L12 19.012 13.409 17z" />
-          </svg>
+          <img src="./assets/bubble.svg" alt="chat" />
         </div>
       ) : (
         <div className={isCollapsed ? "chat-collapsed" : "chat-expanded"}>
@@ -133,31 +146,27 @@ class App extends React.Component {
             onClick={() => this.setState({ isCollapsed: true })}
             className="collapse-icon"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              width="24"
-              height="24"
-            >
-              <path fill="none" d="M0 0h24v24H0z" />
-              <path d="M12.36 13.05L17.31 18H5.998V6.688l4.95 4.95 5.656-5.657 1.415 1.414z" />
-            </svg>
+            <img src="./assets/close.svg" alt="collapse" />
           </div>
-          <OnLine users={users} />
+          <OnlineUsers users={users} />
           <Chat messages={messages} id={id} />
           <Input submitMessage={this.submitMessage.bind(this)} />
         </div>
       );
     } else {
       return (
-        <input
-          autoFocus={true}
-          className="name-input"
-          placeholder="Enter your name to start chatting!"
-          onKeyDown={(e) => this.handleName(e.key)}
-          value={this.state.name}
-          spellCheck="false"
-        />
+        <div>
+          <button onClick={this.mmEnable}>MM</button>
+          <input
+            readOnly
+            autoFocus={true}
+            className="name-input"
+            placeholder="Enter your name to start chatting!"
+            onKeyDown={(e) => this.handleName(e.key)}
+            value={this.state.name}
+            spellCheck="false"
+          />
+        </div>
       );
     }
   }
@@ -192,14 +201,14 @@ class Input extends React.PureComponent {
   }
 
   componentDidMount() {
-      if(this.inputField) {
-          window.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") {
-              this.inputField.current.focus();
-              this.setState({ value: "" });
-            }
-          });
-      }
+    if (this.inputField) {
+      window.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          this.inputField.current.focus();
+          this.setState({ value: "" });
+        }
+      });
+    }
   }
 
   handleSend = (e) => {
@@ -255,7 +264,7 @@ class Message extends React.PureComponent {
   }
 }
 
-class OnLine extends React.PureComponent {
+class OnlineUsers extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
