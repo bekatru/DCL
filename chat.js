@@ -137,7 +137,7 @@ class App extends React.Component {
                     className="expand-icon"
                     onClick={() => this.setState({ isCollapsed: false })}
                 >
-                    <img src="./assets/bubble.svg" alt="chat" />
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="44" height="44"><path fill="none" d="M0 0h24v24H0z" /><path stroke="white" fill="white" d="M14.45 19L12 22.5 9.55 19H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-6.55zm-1.041-2H20V5H4v12h6.591L12 19.012 13.409 17z" /></svg>
                 </div>
             ) : (
                 <div className={isCollapsed ? "chat-collapsed" : "chat-expanded"}>
@@ -145,7 +145,7 @@ class App extends React.Component {
                         onClick={() => this.setState({ isCollapsed: true })}
                         className="collapse-icon"
                     >
-                        <img src="./assets/close.svg" alt="collapse" />
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z" /><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z" /></svg>
                     </div>
                     <OnlineUsers users={users} />
                     <Chat messages={messages} id={id} />
